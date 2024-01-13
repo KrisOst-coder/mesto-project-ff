@@ -1,25 +1,25 @@
 const cardTemplate = document.querySelector('#card-template').content;
 const cards = document.querySelector('.places__list'); 
 
-function delete_func(deleteButton) {
+function deleteFunc(deleteButton) {
     const listItem = deleteButton.closest('.places__item');
     listItem.remove();
 }
 
-function cardMake (card_info) {
-    let cardElement = cardTemplate.querySelector('.places__item').cloneNode(true); 
-    cardElement.querySelector('.card__image').src = card_info['link'];
-    cardElement.querySelector('.card__title').textContent = card_info['name'];
+function cardMake (cardInfo, deleteFunc) {
+    const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true); 
+    cardElement.querySelector('.card__image').src = cardInfo['link'];
+    cardElement.querySelector('.card__image').alt = cardInfo['name'];
+    cardElement.querySelector('.card__title').textContent = cardInfo['name'];
     const deleteButton = cardElement.querySelector('.card__delete-button');
     deleteButton.addEventListener('click', function () {
-        delete_func(deleteButton)
+        deleteFunc(deleteButton)
     });
     return cardElement
 }
 
-for (let i = 0; i < initialCards.length; i++) {
-    cards.append(cardMake(initialCards[i]));
-}
+initialCards.forEach((element) => cards.append(cardMake(element, deleteFunc)))
+
 
 // @todo: DOM узлы
 
