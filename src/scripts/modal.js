@@ -1,39 +1,25 @@
+const editPopUp = document.querySelector(".popup_type_edit");
+const newCardPopUp = document.querySelector(".popup_type_new-card");
+const imagePopUp = document.querySelector(".popup_type_image")
+
+function handleCloseByEsc(e, window) {
+    if(e.key === 'Escape') {
+        closeModalWindow(window)
+    }
+} 
+
 function openModalWindow(window) {
     window.classList.add("popup_is-opened");
-    document.addEventListener('keydown', function (e) {
-		if(e.key === 27) {
-            closeModalWindow(window)
-        }
-    })
-
+    document.addEventListener('keydown', handleCloseByEsc(window))
 }
 
 function closeModalWindow(window) {
-    if ( !window.className.includes("popup_is-opened") ) {
+    if ( !window.classList.contains("popup_is-opened") ) {
         window.classList.remove("popup_is-closed");
     }
     window.classList.remove("popup_is-opened");
     window.classList.add("popup_is-closed");
-    document.removeEventListener('keydown', function (e) {
-		if(e.key === 27) {
-            closeModalWindow(window)
-        }
-    })
+    document.removeEventListener('keydown', handleCloseByEsc)
 }
 
-function openModalWindowImage(imagePopUp, image, link, name) {
-    image.addEventListener('click', function (event) {
-        const PopImage = document.querySelector('.popup__image'); 
-        PopImage.src = link
-        const PopText = document.querySelector('.popup__caption'); 
-        PopText.textContent = name;
-        
-        if (!event.target.className.includes("card__like-button")) {
-            if (event.target.className !== "card__delete-button") {
-                openModalWindow(imagePopUp)
-            }
-        }
-    });
-}
-
-export { openModalWindow, closeModalWindow, openModalWindowImage }
+export { openModalWindow, closeModalWindow }

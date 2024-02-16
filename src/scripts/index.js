@@ -1,11 +1,11 @@
 import '../styles/index.css';
 import { initialCards } from './cards.js';
-import { deleteCard, likeFunc, createCard } from './card.js';
-import { openModalWindow, closeModalWindow, openModalWindowImage } from './modal.js';
+import { deleteCard, likeFunc, createCard, openModalWindowImage } from './card.js';
+import { openModalWindow, closeModalWindow } from './modal.js';
 
 const cardTemplate = document.querySelector('#card-template').content;
 const cardsContainer = document.querySelector('.places__list'); 
-const edit = document.querySelector('.profile__edit-button');
+const buttonOpenProfileEditPopup = document.querySelector('.profile__edit-button');
 const editPopUp = document.querySelector(".popup_type_edit")
 const newCard = document.querySelector('.profile__add-button'); 
 const newCardPopUp = document.querySelector(".popup_type_new-card");
@@ -15,19 +15,18 @@ const newPopUpClose = document.querySelector('.new__close');
 const imagePopUpClose = document.querySelector('.image__close');
 const inputName = document.querySelector('.popup__input_type_name');
 const profileName = document.querySelector('.profile__title');
-const descriptionName = document.querySelector('.popup__input_type_description');
+const descriptionInput = document.querySelector('.popup__input_type_description');
 const profileDescription = document.querySelector('.profile__description');
 
 const popUpList = [editPopUp, newCardPopUp, imagePopUp]
 const popUpCloseList = [editPopUpClose, newPopUpClose, imagePopUpClose]
 
-initialCards.forEach((element) => cardsContainer.append(createCard(cardTemplate, imagePopUp, element, deleteCard, likeFunc, openModalWindowImage)))
-const image = document.querySelectorAll(".places__item");
+initialCards.forEach((element) => cardsContainer.append(createCard(cardTemplate, imagePopUp, element, deleteCard, likeFunc, openModalWindowImage)));
 
-edit.addEventListener('click', function (event) {
+buttonOpenProfileEditPopup.addEventListener('click', function (event) {
     openModalWindow(editPopUp);
     inputName.value = profileName.textContent;
-    descriptionName.value = profileDescription.textContent;
+    descriptionInput.value = profileDescription.textContent;
 }); 
 
 newCard.addEventListener('click', function (event) {
@@ -40,34 +39,25 @@ for (let i = 0; i < popUpList.length; ++i) {
     });
 }
 
-popUpList.forEach(popup => {
-    popup.addEventListener('click', function (event) {
-        if ( event.target.className.includes("popup ") ) {
-            closeModalWindow(popup);
-        }
-    })
-})
-
 // форма профиля
 const formEditProfile = document.forms["edit-profile"];
 
 const nameInput = formEditProfile.elements.name
-const jobInput = formEditProfile.elements.description
-const namePlace = document.querySelector('.profile__title');
-const descriptionPlace = document.querySelector('.profile__description');
+const descriptionInputForm = formEditProfile.elements.description;
 
 function handleProfileFormSubmit(evt) {
     evt.preventDefault();
     const name = nameInput.value;
-    const job = jobInput.value;
+    const description = descriptionInputForm.value;
 
-    namePlace.textContent = name;
-    descriptionPlace.textContent = job;
+    profileName.textContent = name;
+    profileDescription.textContent = description;
 
     closeModalWindow(editPopUp);
 }
 
 formEditProfile.addEventListener('submit', handleProfileFormSubmit);
+
 
 // форма карточек
 
@@ -84,6 +74,10 @@ function handleCardFormSubmit(evt) {
     };
     cardsContainer.prepend(createCard(cardTemplate, imagePopUp, item, deleteCard, likeFunc, openModalWindowImage));
     closeModalWindow(newCardPopUp);
+    placeInput.value = "";
+    linkInput.value = "";
 }
 
 formAddCard.addEventListener('submit', handleCardFormSubmit);
+
+
