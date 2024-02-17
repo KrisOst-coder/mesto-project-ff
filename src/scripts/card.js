@@ -1,7 +1,5 @@
-import { openModalWindow, closeModalWindow } from './modal.js';
-
-const editPopUp = document.querySelector(".popup_type_edit");
-const newCardPopUp = document.querySelector(".popup_type_new-card");
+import { openModalWindow, closeModalWindow, setCloseModalByOverlay  } from './modal.js';
+import { openImageModal } from './index.js'
 
 function deleteCard(deleteButton) {
     const listItem = deleteButton.closest('.places__item');
@@ -16,37 +14,13 @@ function likeFunc(likeButton) {
     }
 }
 
-function handleCloseByOverlay(popUpList) {
-    popUpList.forEach(popup => {
-        popup.addEventListener('click', function (event) {
-            if ( event.target.classList.contains("popup") ) {
-                closeModalWindow(popup);
-            }
-        })
-    })
-}
-
-function openModalWindowImage(imagePopUp, image, link, name) {
-    image.addEventListener('click', function (event) {
-        const popImage = document.querySelector('.popup__image'); 
-        popImage.src = link
-        popImage.alt = name;
-        const popText = document.querySelector('.popup__caption'); 
-        popText.textContent = name;
-
-        openModalWindow(imagePopUp);
-    });
-
-    handleCloseByOverlay([editPopUp, newCardPopUp, imagePopUp]);
-}
-
-function createCard(cardTemplate, imagePopUp, cardInfo, deleteCard, likeFunc, openModalWindowImage) {
+function createCard(cardTemplate, imagePopUp, cardInfo, deleteCard, likeFunc) {
     const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true); 
     const image = cardElement.querySelector('.card__image');
     image.src = cardInfo.link;
     image.alt = cardInfo.name;
     cardElement.querySelector('.card__title').textContent = cardInfo.name;
-    image.addEventListener('click', () => openModalWindowImage(imagePopUp, cardElement, cardInfo.link, cardInfo.name));
+    image.addEventListener('click', () => openImageModal(cardInfo.link, cardInfo.name));
     const deleteButton = cardElement.querySelector('.card__delete-button');
     deleteButton.addEventListener('click', function () {
         deleteCard(deleteButton)
@@ -61,4 +35,4 @@ function createCard(cardTemplate, imagePopUp, cardInfo, deleteCard, likeFunc, op
 }
 
 
-export { deleteCard, likeFunc, createCard, openModalWindowImage }
+export { deleteCard, likeFunc, createCard }

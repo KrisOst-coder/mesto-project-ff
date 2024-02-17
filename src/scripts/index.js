@@ -1,7 +1,7 @@
 import '../styles/index.css';
 import { initialCards } from './cards.js';
-import { deleteCard, likeFunc, createCard, openModalWindowImage } from './card.js';
-import { openModalWindow, closeModalWindow } from './modal.js';
+import { deleteCard, likeFunc, createCard } from './card.js';
+import { openModalWindow, closeModalWindow, setCloseModalByOverlay } from './modal.js';
 
 const cardTemplate = document.querySelector('#card-template').content;
 const cardsContainer = document.querySelector('.places__list'); 
@@ -21,7 +21,7 @@ const profileDescription = document.querySelector('.profile__description');
 const popUpList = [editPopUp, newCardPopUp, imagePopUp]
 const popUpCloseList = [editPopUpClose, newPopUpClose, imagePopUpClose]
 
-initialCards.forEach((element) => cardsContainer.append(createCard(cardTemplate, imagePopUp, element, deleteCard, likeFunc, openModalWindowImage)));
+initialCards.forEach((element) => cardsContainer.append(createCard(cardTemplate, imagePopUp, element, deleteCard, likeFunc)));
 
 buttonOpenProfileEditPopup.addEventListener('click', function (event) {
     openModalWindow(editPopUp);
@@ -56,6 +56,18 @@ function handleProfileFormSubmit(evt) {
     closeModalWindow(editPopUp);
 }
 
+function openImageModal(link, name) {
+    const popImage = document.querySelector('.popup__image'); 
+    popImage.src = link
+    popImage.alt = name;
+    const popText = document.querySelector('.popup__caption'); 
+    popText.textContent = name;
+
+    openModalWindow(imagePopUp);
+    setCloseModalByOverlay([editPopUp, newCardPopUp, imagePopUp]);
+        
+}
+
 formEditProfile.addEventListener('submit', handleProfileFormSubmit);
 
 
@@ -72,7 +84,7 @@ function handleCardFormSubmit(evt) {
         name: placeInput.value,
         link: linkInput.value,
     };
-    cardsContainer.prepend(createCard(cardTemplate, imagePopUp, item, deleteCard, likeFunc, openModalWindowImage));
+    cardsContainer.prepend(createCard(cardTemplate, imagePopUp, item, deleteCard, likeFunc));
     closeModalWindow(newCardPopUp);
     placeInput.value = "";
     linkInput.value = "";
@@ -80,4 +92,4 @@ function handleCardFormSubmit(evt) {
 
 formAddCard.addEventListener('submit', handleCardFormSubmit);
 
-
+export { openImageModal }

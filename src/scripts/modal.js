@@ -4,22 +4,29 @@ const imagePopUp = document.querySelector(".popup_type_image")
 
 function handleCloseByEsc(e, window) {
     if(e.key === 'Escape') {
-        closeModalWindow(window)
+        const openedModal = document.querySelector('.popup_is-opened');
+        closeModalWindow(openedModal);
     }
 } 
 
 function openModalWindow(window) {
     window.classList.add("popup_is-opened");
-    document.addEventListener('keydown', handleCloseByEsc(window))
+    document.addEventListener('keydown', handleCloseByEsc)
 }
 
 function closeModalWindow(window) {
-    if ( !window.classList.contains("popup_is-opened") ) {
-        window.classList.remove("popup_is-closed");
-    }
     window.classList.remove("popup_is-opened");
-    window.classList.add("popup_is-closed");
     document.removeEventListener('keydown', handleCloseByEsc)
 }
 
-export { openModalWindow, closeModalWindow }
+function setCloseModalByOverlay(popUpList) {
+    popUpList.forEach(popup => {
+        popup.addEventListener('click', function (event) {
+            if ( event.target.classList.contains("popup") ) {
+                closeModalWindow(popup);
+            }
+        })
+    })
+}
+
+export { openModalWindow, closeModalWindow, setCloseModalByOverlay }
