@@ -17,11 +17,16 @@ const inputName = document.querySelector('.popup__input_type_name');
 const profileName = document.querySelector('.profile__title');
 const descriptionInput = document.querySelector('.popup__input_type_description');
 const profileDescription = document.querySelector('.profile__description');
+const popImage = document.querySelector('.popup__image'); 
+const popText = document.querySelector('.popup__caption'); 
 
 const popUpList = [editPopUp, newCardPopUp, imagePopUp]
 const popUpCloseList = [editPopUpClose, newPopUpClose, imagePopUpClose]
 
-initialCards.forEach((element) => cardsContainer.append(createCard(cardTemplate, imagePopUp, element, deleteCard, likeFunc)));
+initialCards.forEach(function(element) {
+    cardsContainer.append(createCard(cardTemplate, element, deleteCard, likeFunc, openImageModal));
+    imagePopUp.classList.add("popup_is-animated");
+})
 
 buttonOpenProfileEditPopup.addEventListener('click', function (event) {
     openModalWindow(editPopUp);
@@ -57,15 +62,10 @@ function handleProfileFormSubmit(evt) {
 }
 
 function openImageModal(link, name) {
-    const popImage = document.querySelector('.popup__image'); 
     popImage.src = link
     popImage.alt = name;
-    const popText = document.querySelector('.popup__caption'); 
     popText.textContent = name;
-
-    openModalWindow(imagePopUp);
-    setCloseModalByOverlay([editPopUp, newCardPopUp, imagePopUp]);
-        
+    openModalWindow(imagePopUp);   
 }
 
 formEditProfile.addEventListener('submit', handleProfileFormSubmit);
@@ -84,12 +84,14 @@ function handleCardFormSubmit(evt) {
         name: placeInput.value,
         link: linkInput.value,
     };
-    cardsContainer.prepend(createCard(cardTemplate, imagePopUp, item, deleteCard, likeFunc));
+    cardsContainer.prepend(createCard(cardTemplate, item, deleteCard, likeFunc, openImageModal));
+    imagePopUp.classList.add("popup_is-animated");
     closeModalWindow(newCardPopUp);
     placeInput.value = "";
     linkInput.value = "";
 }
 
 formAddCard.addEventListener('submit', handleCardFormSubmit);
+setCloseModalByOverlay([editPopUp, newCardPopUp, imagePopUp]);
 
 export { openImageModal }

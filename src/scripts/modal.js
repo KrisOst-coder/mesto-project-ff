@@ -1,7 +1,3 @@
-const editPopUp = document.querySelector(".popup_type_edit");
-const newCardPopUp = document.querySelector(".popup_type_new-card");
-const imagePopUp = document.querySelector(".popup_type_image")
-
 function handleCloseByEsc(e, window) {
     if(e.key === 'Escape') {
         const openedModal = document.querySelector('.popup_is-opened');

@@ -1,5 +1,5 @@
 import { openModalWindow, closeModalWindow, setCloseModalByOverlay  } from './modal.js';
-import { openImageModal } from './index.js'
+// import { openImageModal } from './index.js'
 
 function deleteCard(deleteButton) {
     const listItem = deleteButton.closest('.places__item');
@@ -14,7 +14,7 @@ function likeFunc(likeButton) {
     }
 }
 
-function createCard(cardTemplate, imagePopUp, cardInfo, deleteCard, likeFunc) {
+function createCard(cardTemplate, cardInfo, deleteCard, likeFunc, openImageModal) {
     const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true); 
     const image = cardElement.querySelector('.card__image');
     image.src = cardInfo.link;
@@ -26,7 +26,6 @@ function createCard(cardTemplate, imagePopUp, cardInfo, deleteCard, likeFunc) {
         deleteCard(deleteButton)
     });
     const likeButton = cardElement.querySelector('.card__like-button');
-    imagePopUp.classList.add("popup_is-animated");
     likeButton.addEventListener('click', function () {
         likeFunc(likeButton);
     });
