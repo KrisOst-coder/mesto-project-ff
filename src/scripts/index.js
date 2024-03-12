@@ -28,6 +28,9 @@ initialCards.forEach(function(element) {
     imagePopUp.classList.add("popup_is-animated");
 })
 
+newCardPopUp.classList.add("popup_is-animated");
+editPopUp.classList.add("popup_is-animated");
+
 buttonOpenProfileEditPopup.addEventListener('click', function (event) {
     openModalWindow(editPopUp);
     inputName.value = profileName.textContent;
