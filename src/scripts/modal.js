@@ -10,9 +10,11 @@ function openModalWindow(window) {
     document.addEventListener('keydown', handleCloseByEsc)
 }
 
-function closeModalWindow(window) {
+function closeModalWindow(window, button) {
     window.classList.remove("popup_is-opened");
     document.removeEventListener('keydown', handleCloseByEsc)
+    button.textContent = "Сохранить"
+    button.disabled = false
 }
 
 function setCloseModalByOverlay(popUpList) {

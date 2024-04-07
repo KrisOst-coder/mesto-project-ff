@@ -1,37 +1,77 @@
 import { openModalWindow, closeModalWindow, setCloseModalByOverlay  } from './modal.js';
-// import { openImageModal } from './index.js'
+import { userInfo, dowloadCards, editProfile, addCard, deleteCardApi, likeCard, unLikeCard } from './api.js'
+import { openImageModal } from './index.js'
 
-function deleteCard(deleteButton) {
-    const listItem = deleteButton.closest('.places__item');
-    listItem.remove();
+const cardTemplate = document.querySelector('#card-template').content;
+const deleteCardPopUp = document.querySelector(".popup_agree_with_delete");
+
+const userMe = await fetch('https://nomoreparties.co/v1/wff-cohort-10/users/me',  {
+    headers: {
+        authorization: '1b672ea5-50fb-43e7-92f6-8a26aeae5f47',
+        'Content-Type': 'application/json'
+    }
+  });
+  
+const dataUser = await userMe.json();
+const userId = dataUser['_id'];
+
+function deleteCardfromDOM(card) {
+    card.remove();
 }
 
-function likeFunc(likeButton) {
-    if (likeButton.classList.contains("card__like-button_is-active")) {
-        likeButton.classList.remove('card__like-button_is-active');
+function createCard(element) {
+    const name = element.name
+    const link = element.link
+    const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
+    const image = cardElement.querySelector('.card__image');
+
+    image.alt = name;
+    image.src = link;
+    cardElement.querySelector('.card__title').textContent = name;
+    image.addEventListener('click', () => openImageModal(link, name));
+    cardElement.querySelector('.likes-count').textContent = element.likes.length;
+    if (userId === element.owner["_id"]) {
+        console.log("in")
+        const deleteButton = cardElement.querySelector('.card__delete-button');
+        const deleteCardPopUpButton = document.querySelector(".popup__button_agree_with_delete");
+        deleteButton.addEventListener('click', function () {
+            openModalWindow(deleteCardPopUp);
+            deleteCardPopUpButton.addEventListener("click", () => {
+                deleteCardApi(element["_id"], cardElement)
+                .then((res) => {
+                    deleteCardfromDOM(cardElement)
+                    closeModalWindow(deleteCardPopUp)
+                })
+                
+            })
+        });
     } else {
+        // скроем кнопку удаления не нашего поста с помощью css
+        cardElement.querySelector('.card__delete-button').style.display = "none"
+    }
+    const likeButton = cardElement.querySelector('.card__like-button');
+    if (element.likes.some((elem) => elem._id === userId)) {
         likeButton.classList.add('card__like-button_is-active');
     }
-}
-
-function createCard(cardTemplate, cardInfo, deleteCard, likeFunc, openImageModal) {
-    const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true); 
-    const image = cardElement.querySelector('.card__image');
-    image.src = cardInfo.link;
-    image.alt = cardInfo.name;
-    cardElement.querySelector('.card__title').textContent = cardInfo.name;
-    image.addEventListener('click', () => openImageModal(cardInfo.link, cardInfo.name));
-    const deleteButton = cardElement.querySelector('.card__delete-button');
-    deleteButton.addEventListener('click', function () {
-        deleteCard(deleteButton)
-    });
-    const likeButton = cardElement.querySelector('.card__like-button');
     likeButton.addEventListener('click', function () {
-        likeFunc(likeButton);
+        if (element.likes.some((elem) => elem._id === userId)) {
+            likeButton.classList.remove('card__like-button_is-active');
+            unLikeCard(element["_id"])
+            .then((res) => {
+                cardElement.querySelector('.likes-count').textContent = res.likes.length;
+                element = res
+            })
+        } else {
+            likeButton.classList.add('card__like-button_is-active');
+            likeCard(element["_id"])
+            .then((res) => {
+                cardElement.querySelector('.likes-count').textContent = res.likes.length;
+                element = res
+            })
+        }
     });
 
     return cardElement
 }
 
-
-export { deleteCard, likeFunc, createCard }
+export { createCard }
