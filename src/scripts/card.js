@@ -1,25 +1,25 @@
-import { openModalWindow, closeModalWindow, setCloseModalByOverlay  } from './modal.js';
+import { openModalWindow, closeModalWindow  } from './modal.js';
 import { userInfo, dowloadCards, editProfile, addCard, deleteCardApi, likeCard, unLikeCard } from './api.js'
 import { openImageModal } from './index.js'
 
 const cardTemplate = document.querySelector('#card-template').content;
 const deleteCardPopUp = document.querySelector(".popup_agree_with_delete");
 
-const userMe = await fetch('https://nomoreparties.co/v1/wff-cohort-10/users/me',  {
-    headers: {
-        authorization: '1b672ea5-50fb-43e7-92f6-8a26aeae5f47',
-        'Content-Type': 'application/json'
-    }
-  });
-  
-const dataUser = await userMe.json();
-const userId = dataUser['_id'];
-
 function deleteCardfromDOM(card) {
     card.remove();
 }
 
-function createCard(element) {
+function pushLike(element, likeButton, userId) {
+    if (element.likes.some((elem) => elem._id === userId)) {
+        likeButton.classList.remove('card__like-button_is-active');
+        return true
+    } else {
+        likeButton.classList.add('card__like-button_is-active');
+        return false
+    }
+}
+
+function createCard(element, userId) {
     const name = element.name
     const link = element.link
     const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
@@ -54,18 +54,18 @@ function createCard(element) {
         likeButton.classList.add('card__like-button_is-active');
     }
     likeButton.addEventListener('click', function () {
-        if (element.likes.some((elem) => elem._id === userId)) {
-            likeButton.classList.remove('card__like-button_is-active');
+        if (pushLike(element, likeButton, userId)) {
             unLikeCard(element["_id"])
             .then((res) => {
                 cardElement.querySelector('.likes-count').textContent = res.likes.length;
+                console.log("вот так", res)
                 element = res
-            })
+        })
         } else {
-            likeButton.classList.add('card__like-button_is-active');
             likeCard(element["_id"])
             .then((res) => {
                 cardElement.querySelector('.likes-count').textContent = res.likes.length;
+                console.log("вот так", res)
                 element = res
             })
         }

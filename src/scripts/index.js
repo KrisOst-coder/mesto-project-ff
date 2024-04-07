@@ -1,7 +1,6 @@
 import '../styles/index.css';
-import { initialCards } from './cards.js';
 import { deleteCard, likeFunc, createCard } from './card.js';
-import { openModalWindow, closeModalWindow, setCloseModalByOverlay } from './modal.js';
+import { openModalWindow, closeModalWindow } from './modal.js';
 import { enableValidation, clearValidation } from './validation.js'
 import { userInfo, dowloadCards, editProfile, addCard, avatarUpdate } from './api.js'
 
@@ -30,6 +29,13 @@ const formEditProfile = document.forms["edit-profile"];
 const formAddCard = document.forms["new-place"];
 const formEditAvatar = document.forms["update-avatar"];
 
+const buttonElementAddCard = formAddCard.querySelector('.popup__button');
+const buttonElementEditAvatar = formEditAvatar.querySelector('.popup__button');
+
+console.log(buttonElementAddCard.disabled)
+buttonElementAddCard.disabled = true;
+buttonElementEditAvatar.disabled = true;
+
 const popUpList = [editPopUp, newCardPopUp, imagePopUp, deleteCardPopUp, updateAvatarPopUp]
 const popUpCloseList = [editPopUpClose, newPopUpClose, imagePopUpClose, deleteCardPopUpClose, updateAvatarPopUpClose]
 
@@ -42,10 +48,20 @@ const validationConfig = {
     errorClass: 'popup__error_visible'
 };
 
+const userMe = await fetch('https://nomoreparties.co/v1/wff-cohort-10/users/me',  {
+    headers: {
+        authorization: '1b672ea5-50fb-43e7-92f6-8a26aeae5f47',
+        'Content-Type': 'application/json'
+    }
+  });
+  
+const dataUser = await userMe.json();
+const userId = dataUser['_id'];
+
 dowloadCards()
 .then((data) => {
     data.forEach((element) => {
-        cardsContainer.append(createCard(element));
+        cardsContainer.append(createCard(element, userId));
         imagePopUp.classList.add("popup_is-animated");
     })
 })
@@ -81,16 +97,24 @@ for (let i = 0; i < popUpList.length; ++i) {
     });
 }
 
+function setCloseModalByOverlay(popUpList) {
+    popUpList.forEach(popup => {
+        popup.addEventListener('click', function (event) {
+            if ( event.target.classList.contains("popup") ) {
+                closeModalWindow(popup);
+            }
+        })
+    })
+}
+
 // форма профиля
-
-
 const nameInput = formEditProfile.elements.name
 const descriptionInputForm = formEditProfile.elements.description;
 const submitbuttonEditProfile = formEditProfile.querySelector(".popup__button")
 
 function handleProfileFormSubmit(evt) {
     submitbuttonEditProfile.textContent = "Сохранение..."
-    submitbuttonEditProfile.disabled = true
+    submitbuttonEditProfile.disabled = false
     evt.preventDefault();
     const name = nameInput.value;
     const description = descriptionInputForm.value;
@@ -100,7 +124,9 @@ function handleProfileFormSubmit(evt) {
     }))
     profileName.textContent = name;
     profileDescription.textContent = description;
-    closeModalWindow(editPopUp, submitbuttonEditProfile);
+    submitbuttonEditProfile.textContent = "Сохранить";
+    submitbuttonEditProfile.disabled = true;
+    closeModalWindow(editPopUp);
 }
 
 function openImageModal(link, name) { 
@@ -120,19 +146,21 @@ const submitbuttonAddCard = formAddCard.querySelector(".popup__button")
 
 function handleCardFormSubmit(evt) {
     submitbuttonAddCard.textContent = "Сохранение..."
-    submitbuttonAddCard.disabled = true
+    submitbuttonAddCard.disabled = false
     evt.preventDefault();
     addCard(JSON.stringify({
         name: placeInput.value,
         link: linkInput.value,
     }))
     .then((data) => {
-        cardsContainer.prepend(createCard(data));
+        cardsContainer.prepend(createCard(data, userId));
         imagePopUp.classList.add("popup_is-animated");
     });
 
     imagePopUp.classList.add("popup_is-animated");
-    closeModalWindow(newCardPopUp, submitbuttonAddCard);
+    submitbuttonAddCard.textContent = "Сохранить";
+    submitbuttonAddCard.disabled = true;
+    closeModalWindow(newCardPopUp);
     placeInput.value = "";
     linkInput.value = "";
 }
@@ -156,7 +184,7 @@ avatarChangeButton.addEventListener('click', function (event) {
 
 function handleAvatarFormSubmit(evt) {
     submitbuttonChangeAvatar.textContent = "Сохранение..."
-    submitbuttonChangeAvatar.disabled = true
+    submitbuttonChangeAvatar.disabled = false
     
     evt.preventDefault();
     // меняется но при обновлении страницы не сохраняется
@@ -166,7 +194,9 @@ function handleAvatarFormSubmit(evt) {
     .then((res) => {
         avatarDOM.style['background-image'] = `url(${res.avatar})`;
         linkAvatarInput.value = "";
-        closeModalWindow(updateAvatarPopUp, submitbuttonChangeAvatar);
+        submitbuttonChangeAvatar.textContent = "Сохранить";
+        submitbuttonChangeAvatar.disabled = true;
+        closeModalWindow(updateAvatarPopUp);
     })
     
 }
@@ -175,7 +205,8 @@ formEditAvatar.addEventListener('submit', handleAvatarFormSubmit);
 
 
 const formElementList = [formEditProfile, formAddCard, formEditAvatar];
-enableValidation(formElementList)
+
+enableValidation(validationConfig)
 
 export { openImageModal }
 

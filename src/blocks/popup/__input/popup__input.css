@@ -16,6 +16,7 @@
 }
 
 .form__input-error_active {
+  font-size: 12px;
   font-family: 'Inter', Arial, sans-serif;
   color: #FF0000;
 }

@@ -1,6 +1,3 @@
-const popUpEdit = document.querySelector(".popup_type_edit")
-const buttonEdit = popUpEdit.querySelector(".popup__button")
-
 const regex = /^[а-яА-Яa-zA-ZЁё\-\s]*$/;
 
 const hasInvalidInput = (formList) => {
@@ -62,9 +59,9 @@ const checkInputValidity = (formInputList, formErrorItem) => {
     }
 };
 
-function setEventListeners(formElement) {
-  const inputList = Array.from(formElement.querySelectorAll(`.popup__input`));
-  const buttonElement = formElement.querySelector('.popup__button');
+function setEventListeners(formElement, validationConfig) {
+  const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
+  const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector);
   inputList.forEach((inputElement) => {
     inputElement.addEventListener('input', () => {
         const errorElement = formElement.querySelector(`.${inputElement.classList[1]}-error`);
@@ -74,12 +71,13 @@ function setEventListeners(formElement) {
   });
 };
 
-function enableValidation(formElementList) {
+function enableValidation(validationConfig) {
+    const formElementList = Array.from(document.querySelectorAll(validationConfig.formSelector))
     formElementList.forEach((formElement) => {
         formElement.addEventListener('submit', function (evt) {
             evt.preventDefault();
         });
-        setEventListeners(formElement);
+        setEventListeners(formElement, validationConfig);
     })
     
 }
