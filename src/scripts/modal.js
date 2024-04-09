@@ -1,3 +1,5 @@
+import { enableValidation, clearValidation } from './validation.js'
+
 function handleCloseByEsc(e) {
     if(e.key === 'Escape') {
         const openedModal = document.querySelector('.popup_is-opened');
@@ -5,9 +7,13 @@ function handleCloseByEsc(e) {
     }
 } 
 
-function openModalWindow(popup) {
+function openModalWindow(popup, popupClose) {
     popup.classList.add("popup_is-opened");
     document.addEventListener('keydown', handleCloseByEsc)
+    popupClose.addEventListener('click', function (event) {
+        closeModalWindow(popup);
+        clearValidation(popup);
+    });
 }
 
 function closeModalWindow(popup) {

@@ -39,63 +39,42 @@ buttonElementEditAvatar.disabled = true;
 const popUpList = [editPopUp, newCardPopUp, imagePopUp, deleteCardPopUp, updateAvatarPopUp]
 const popUpCloseList = [editPopUpClose, newPopUpClose, imagePopUpClose, deleteCardPopUpClose, updateAvatarPopUpClose]
 
-const validationConfig = {
-    formSelector: '.popup__form',
-    inputSelector: '.popup__input',
-    submitButtonSelector: '.popup__button',
-    inactiveButtonClass: 'popup__button_disabled',
-    inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
-};
-
-const userMe = await fetch('https://nomoreparties.co/v1/wff-cohort-10/users/me',  {
-    headers: {
-        authorization: '1b672ea5-50fb-43e7-92f6-8a26aeae5f47',
-        'Content-Type': 'application/json'
-    }
-  });
-  
-const dataUser = await userMe.json();
-const userId = dataUser['_id'];
-
-dowloadCards()
-.then((data) => {
-    data.forEach((element) => {
-        cardsContainer.append(createCard(element, userId));
-        imagePopUp.classList.add("popup_is-animated");
-    })
-})
+let userId = "";
 
 userInfo()
 .then((data) => {
     profileName.textContent = data.name;
     profileDescription.textContent = data.about;
     avatarDOM.style['background-image'] = `url(${data.avatar})`;
+    userId = data['_id']
 })
+.catch((err) => { 
+    console.log(err); 
+});  
 
-newCardPopUp.classList.add("popup_is-animated");
-editPopUp.classList.add("popup_is-animated");
+dowloadCards()
+.then((data) => {
+    data.forEach((element) => {
+        cardsContainer.append(createCard(element, userId, openImageModal));
+    })
+})
+.catch((err) => { 
+    console.log(err); 
+});  
 
 buttonOpenProfileEditPopup.addEventListener('click', function (event) {
-    openModalWindow(editPopUp);
+    openModalWindow(editPopUp, editPopUpClose);
     inputName.value = profileName.textContent;
     descriptionInput.value = profileDescription.textContent;
 }); 
 
 newCard.addEventListener('click', function (event) {
-    openModalWindow(newCardPopUp);
+    const placeInput = formAddCard.elements["place-name"]
+    const linkInput = formAddCard.elements["url"]
+    placeInput.value = "";
+    linkInput.value = "";
+    openModalWindow(newCardPopUp, newPopUpClose);
 });
-
-for (let i = 0; i < popUpList.length; ++i) {
-    popUpCloseList[i].addEventListener('click', function (event) {
-        closeModalWindow(popUpList[i]);
-        if (popUpCloseList[i] === editPopUpClose) {
-            clearValidation(formEditProfile, validationConfig);
-        } else if (popUpCloseList[i] === newPopUpClose)
-        clearValidation(formAddCard, validationConfig);
-        
-    });
-}
 
 function setCloseModalByOverlay(popUpList) {
     popUpList.forEach(popup => {
@@ -122,18 +101,25 @@ function handleProfileFormSubmit(evt) {
         name: name,
         about: description
     }))
-    profileName.textContent = name;
-    profileDescription.textContent = description;
-    submitbuttonEditProfile.textContent = "Сохранить";
-    submitbuttonEditProfile.disabled = true;
-    closeModalWindow(editPopUp);
+    .then((res) => {
+        profileName.textContent = res.name;
+        profileDescription.textContent = res.about;
+        submitbuttonEditProfile.disabled = true;
+        closeModalWindow(editPopUp);
+    })
+    .catch((err) => { 
+        console.log(err); 
+    })
+    .finally(() => {
+        submitbuttonEditProfile.textContent = "Сохранить";
+    });
 }
 
 function openImageModal(link, name) { 
     popImage.src = link
     popImage.alt = name;
     popText.textContent = name;
-    openModalWindow(imagePopUp);   
+    openModalWindow(imagePopUp, imagePopUpClose);   
 }
 
 formEditProfile.addEventListener('submit', handleProfileFormSubmit);
@@ -145,24 +131,19 @@ const linkInput = formAddCard.elements["url"]
 const submitbuttonAddCard = formAddCard.querySelector(".popup__button")
 
 function handleCardFormSubmit(evt) {
-    submitbuttonAddCard.textContent = "Сохранение..."
-    submitbuttonAddCard.disabled = false
     evt.preventDefault();
     addCard(JSON.stringify({
         name: placeInput.value,
         link: linkInput.value,
     }))
     .then((data) => {
-        cardsContainer.prepend(createCard(data, userId));
-        imagePopUp.classList.add("popup_is-animated");
-    });
-
-    imagePopUp.classList.add("popup_is-animated");
-    submitbuttonAddCard.textContent = "Сохранить";
-    submitbuttonAddCard.disabled = true;
-    closeModalWindow(newCardPopUp);
-    placeInput.value = "";
-    linkInput.value = "";
+        cardsContainer.prepend(createCard(data, userId, openImageModal));
+        submitbuttonAddCard.disabled = true;
+        closeModalWindow(newCardPopUp);
+    })
+    .catch((err) => { 
+        console.log(err); 
+    })
 }
 
 formAddCard.addEventListener('submit', handleCardFormSubmit);
@@ -178,14 +159,11 @@ const linkAvatarInput = formEditAvatar.elements.url;
 const submitbuttonChangeAvatar = formEditAvatar.querySelector(".popup__button")
 
 avatarChangeButton.addEventListener('click', function (event) {
-    openModalWindow(updateAvatarPopUp);
+    openModalWindow(updateAvatarPopUp, updateAvatarPopUpClose);
 }); 
 
 
 function handleAvatarFormSubmit(evt) {
-    submitbuttonChangeAvatar.textContent = "Сохранение..."
-    submitbuttonChangeAvatar.disabled = false
-    
     evt.preventDefault();
     // меняется но при обновлении страницы не сохраняется
     avatarUpdate(JSON.stringify({
@@ -194,10 +172,12 @@ function handleAvatarFormSubmit(evt) {
     .then((res) => {
         avatarDOM.style['background-image'] = `url(${res.avatar})`;
         linkAvatarInput.value = "";
-        submitbuttonChangeAvatar.textContent = "Сохранить";
         submitbuttonChangeAvatar.disabled = true;
         closeModalWindow(updateAvatarPopUp);
     })
+    .catch((err) => { 
+        console.log(err); 
+    });
     
 }
 
@@ -206,9 +186,7 @@ formEditAvatar.addEventListener('submit', handleAvatarFormSubmit);
 
 const formElementList = [formEditProfile, formAddCard, formEditAvatar];
 
-enableValidation(validationConfig)
-
-export { openImageModal }
+enableValidation()
 
 
 

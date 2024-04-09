@@ -1,6 +1,5 @@
 import { openModalWindow, closeModalWindow  } from './modal.js';
 import { userInfo, dowloadCards, editProfile, addCard, deleteCardApi, likeCard, unLikeCard } from './api.js'
-import { openImageModal } from './index.js'
 
 const cardTemplate = document.querySelector('#card-template').content;
 const deleteCardPopUp = document.querySelector(".popup_agree_with_delete");
@@ -9,17 +8,23 @@ function deleteCardfromDOM(card) {
     card.remove();
 }
 
-function pushLike(element, likeButton, userId) {
-    if (element.likes.some((elem) => elem._id === userId)) {
+function pushLike(element, likeButton, cardElement) {
+    if (Array.from(likeButton.classList).includes('card__like-button_is-active')) {
         likeButton.classList.remove('card__like-button_is-active');
-        return true
+        unLikeCard(element["_id"])
+        .then((res) => {
+            cardElement.querySelector('.likes-count').textContent = res.likes.length;
+    })
     } else {
         likeButton.classList.add('card__like-button_is-active');
-        return false
+        likeCard(element["_id"])
+        .then((res) => {
+            cardElement.querySelector('.likes-count').textContent = res.likes.length;
+        })
     }
 }
 
-function createCard(element, userId) {
+function createCard(element, userId, openImageModal) {
     const name = element.name
     const link = element.link
     const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
@@ -33,16 +38,16 @@ function createCard(element, userId) {
     if (userId === element.owner["_id"]) {
         console.log("in")
         const deleteButton = cardElement.querySelector('.card__delete-button');
+        const deleteCardPopUpClose = document.querySelector(".delete__close")
         const deleteCardPopUpButton = document.querySelector(".popup__button_agree_with_delete");
         deleteButton.addEventListener('click', function () {
-            openModalWindow(deleteCardPopUp);
+            openModalWindow(deleteCardPopUp, deleteCardPopUpClose);
             deleteCardPopUpButton.addEventListener("click", () => {
                 deleteCardApi(element["_id"], cardElement)
                 .then((res) => {
                     deleteCardfromDOM(cardElement)
                     closeModalWindow(deleteCardPopUp)
-                })
-                
+                }) 
             })
         });
     } else {
@@ -53,23 +58,7 @@ function createCard(element, userId) {
     if (element.likes.some((elem) => elem._id === userId)) {
         likeButton.classList.add('card__like-button_is-active');
     }
-    likeButton.addEventListener('click', function () {
-        if (pushLike(element, likeButton, userId)) {
-            unLikeCard(element["_id"])
-            .then((res) => {
-                cardElement.querySelector('.likes-count').textContent = res.likes.length;
-                console.log("вот так", res)
-                element = res
-        })
-        } else {
-            likeCard(element["_id"])
-            .then((res) => {
-                cardElement.querySelector('.likes-count').textContent = res.likes.length;
-                console.log("вот так", res)
-                element = res
-            })
-        }
-    });
+    likeButton.addEventListener('click', () => pushLike(element, likeButton, cardElement));
 
     return cardElement
 }

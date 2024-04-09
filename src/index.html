@@ -39,7 +39,7 @@
       © 2021 Mesto Russia
     </p>
   </footer>
-  <div class="popup popup_type_edit">
+  <div class="popup popup_type_edit popup_is-animated">
     <div class="popup__content">
       <button type="button" class="popup__close edit__close"></button>
       <h3 class="popup__title">Редактировать профиль</h3>
@@ -52,7 +52,7 @@
       </form>
     </div>
   </div>
-  <div class="popup popup_type_new-card">
+  <div class="popup popup_type_new-card popup_is-animated" >
     <div class="popup__content">
       <button type="button" class="popup__close new__close"></button>
       <h3 class="popup__title">Новое место</h3>
@@ -61,32 +61,32 @@
         <span class="popup__input_type_card-name-error"></span>
         <input type="url" name="url" class="popup__input popup__input_type_url" id="popup__input_type_url" placeholder="Ссылка на картинку" required>
         <span class="popup__input_type_url-error"></span>
-        <button type="submit" class="button popup__button">Сохранить</button>
+        <button type="submit" class="button popup__button inactive__popup__button">Сохранить</button>
       </form>
     </div>
   </div>
-  <div class="popup popup_type_image">
+  <div class="popup popup_type_image popup_is-animated">
     <div class="popup__content popup__content_content_image">
       <button type="button" class="popup__close image__close"></button>
       <img src="" alt="" class="popup__image">
       <p class="popup__caption"></p>
     </div>
   </div>
-  <div class="popup popup_agree_with_delete">
+  <div class="popup popup_agree_with_delete popup_is-animated">
     <div class="popup__content popup__content_agree_with_delete">
       <h3>Вы уверены?</h3>
       <button type="submit" class="button popup__button popup__button_agree_with_delete">Да</button>
       <button type="button" class="popup__close delete__close"></button>
     </div>
   </div>
-  <div class="popup popup_update_avatar">
+  <div class="popup popup_update_avatar popup_is-animated">
     <div class="popup__content popup__content_agree_with_delete">
       <button type="button" class="popup__close avatar__close"></button>
       <h3 class="popup__title">Обновить аватар</h3>
       <form class="popup__form" name="update-avatar">
         <input type="url" name="url" class="popup__input popup__input_type_url" id="popup__input_type_url" placeholder="Ссылка на аватар" required>
         <span class="popup__input_type_url-error"></span>
-        <button type="submit" class="button popup__button">Сохранить</button>
+        <button type="submit" class="button popup__button inactive__popup__button">Сохранить</button>
       </form>
     </div>
   </div>
