@@ -7,12 +7,12 @@ function handleCloseByEsc(e) {
     }
 } 
 
-function openModalWindow(popup, popupClose) {
+function openModalWindow(popup, popupClose, validationConfig) {
     popup.classList.add("popup_is-opened");
     document.addEventListener('keydown', handleCloseByEsc)
     popupClose.addEventListener('click', function (event) {
         closeModalWindow(popup);
-        clearValidation(popup);
+        clearValidation(popup, validationConfig);
     });
 }
 

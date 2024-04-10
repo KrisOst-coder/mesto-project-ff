@@ -32,9 +32,14 @@ const formEditAvatar = document.forms["update-avatar"];
 const buttonElementAddCard = formAddCard.querySelector('.popup__button');
 const buttonElementEditAvatar = formEditAvatar.querySelector('.popup__button');
 
-console.log(buttonElementAddCard.disabled)
-buttonElementAddCard.disabled = true;
-buttonElementEditAvatar.disabled = true;
+const validationConfig = {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'inactive__popup__button',
+    inputErrorClass: 'form__input_type_error',
+    errorClass: 'form__input-error_active'
+};
 
 const popUpList = [editPopUp, newCardPopUp, imagePopUp, deleteCardPopUp, updateAvatarPopUp]
 const popUpCloseList = [editPopUpClose, newPopUpClose, imagePopUpClose, deleteCardPopUpClose, updateAvatarPopUpClose]
@@ -47,23 +52,24 @@ userInfo()
     profileDescription.textContent = data.about;
     avatarDOM.style['background-image'] = `url(${data.avatar})`;
     userId = data['_id']
+    dowloadCards()
+    .then((data) => {
+        data.forEach((element) => {
+            cardsContainer.append(createCard(element, userId, openImageModal));
+        })
+    })
+    .catch((err) => { 
+        console.log(err); 
+    });  
 })
 .catch((err) => { 
     console.log(err); 
 });  
 
-dowloadCards()
-.then((data) => {
-    data.forEach((element) => {
-        cardsContainer.append(createCard(element, userId, openImageModal));
-    })
-})
-.catch((err) => { 
-    console.log(err); 
-});  
+
 
 buttonOpenProfileEditPopup.addEventListener('click', function (event) {
-    openModalWindow(editPopUp, editPopUpClose);
+    openModalWindow(editPopUp, editPopUpClose, validationConfig);
     inputName.value = profileName.textContent;
     descriptionInput.value = profileDescription.textContent;
 }); 
@@ -73,7 +79,7 @@ newCard.addEventListener('click', function (event) {
     const linkInput = formAddCard.elements["url"]
     placeInput.value = "";
     linkInput.value = "";
-    openModalWindow(newCardPopUp, newPopUpClose);
+    openModalWindow(newCardPopUp, newPopUpClose, validationConfig);
 });
 
 function setCloseModalByOverlay(popUpList) {
@@ -92,8 +98,7 @@ const descriptionInputForm = formEditProfile.elements.description;
 const submitbuttonEditProfile = formEditProfile.querySelector(".popup__button")
 
 function handleProfileFormSubmit(evt) {
-    submitbuttonEditProfile.textContent = "Сохранение..."
-    submitbuttonEditProfile.disabled = false
+    
     evt.preventDefault();
     const name = nameInput.value;
     const description = descriptionInputForm.value;
@@ -105,6 +110,7 @@ function handleProfileFormSubmit(evt) {
         profileName.textContent = res.name;
         profileDescription.textContent = res.about;
         submitbuttonEditProfile.disabled = true;
+        submitbuttonEditProfile.textContent = "Сохранение..."
         closeModalWindow(editPopUp);
     })
     .catch((err) => { 
@@ -112,6 +118,7 @@ function handleProfileFormSubmit(evt) {
     })
     .finally(() => {
         submitbuttonEditProfile.textContent = "Сохранить";
+        submitbuttonEditProfile.disabled = false
     });
 }
 
@@ -119,7 +126,7 @@ function openImageModal(link, name) {
     popImage.src = link
     popImage.alt = name;
     popText.textContent = name;
-    openModalWindow(imagePopUp, imagePopUpClose);   
+    openModalWindow(imagePopUp, imagePopUpClose, validationConfig);   
 }
 
 formEditProfile.addEventListener('submit', handleProfileFormSubmit);
@@ -139,11 +146,16 @@ function handleCardFormSubmit(evt) {
     .then((data) => {
         cardsContainer.prepend(createCard(data, userId, openImageModal));
         submitbuttonAddCard.disabled = true;
+        submitbuttonAddCard.textContent = "Сохранение..."
         closeModalWindow(newCardPopUp);
     })
     .catch((err) => { 
         console.log(err); 
     })
+    .finally(() => {
+        submitbuttonAddCard.textContent = "Сохранить";
+        submitbuttonAddCard.disabled = false
+    });
 }
 
 formAddCard.addEventListener('submit', handleCardFormSubmit);
@@ -159,7 +171,7 @@ const linkAvatarInput = formEditAvatar.elements.url;
 const submitbuttonChangeAvatar = formEditAvatar.querySelector(".popup__button")
 
 avatarChangeButton.addEventListener('click', function (event) {
-    openModalWindow(updateAvatarPopUp, updateAvatarPopUpClose);
+    openModalWindow(updateAvatarPopUp, updateAvatarPopUpClose, validationConfig);
 }); 
 
 
@@ -173,20 +185,21 @@ function handleAvatarFormSubmit(evt) {
         avatarDOM.style['background-image'] = `url(${res.avatar})`;
         linkAvatarInput.value = "";
         submitbuttonChangeAvatar.disabled = true;
+        submitbuttonChangeAvatar.textContent = "Сохранение..."
         closeModalWindow(updateAvatarPopUp);
     })
     .catch((err) => { 
         console.log(err); 
+    })
+    .finally(() => {
+        submitbuttonChangeAvatar.textContent = "Сохранить";
+        submitbuttonChangeAvatar.disabled = false
     });
-    
 }
 
 formEditAvatar.addEventListener('submit', handleAvatarFormSubmit);
 
-
-const formElementList = [formEditProfile, formAddCard, formEditAvatar];
-
-enableValidation()
+enableValidation(validationConfig)
 
 
 
